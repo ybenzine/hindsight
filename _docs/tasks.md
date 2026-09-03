@@ -12,12 +12,12 @@ Goal: An empty, runnable Django project with one green test.
 Description: Create the `config/` project and a `pytest` (or Django test runner) setup with a single trivial test that asserts the app imports and the home URL returns 200. Add `requirements.txt`/`pyproject.toml`, a `.gitignore` for Python, and a README section on how to run the server and the tests. No apps or models yet.
 
 ## 2. Settings split, environment config, and local infrastructure
-Goal: Environment-driven settings plus a one-command Postgres and Redis stack.
-Description: Split `config/settings.py` into `base.py`/`dev.py`/`prod.py`, load values with `django-environ` from `DATABASE_URL`, `REDIS_URL`, `SECRET_KEY`, `STORAGE_BACKEND`, `ANTHROPIC_API_KEY`, and email vars, and commit a `.env.example`. Add a `docker-compose.yml` with Postgres and Redis whose ports and credentials match `.env.example`, and document up/down. Confirm `manage.py migrate` and the existing test run against the containerised Postgres under `dev` settings.
+Goal: Environment-driven settings plus a one-command Postgres stack.
+Description: Split `config/settings.py` into `base.py`/`dev.py`/`prod.py`, load values with `django-environ` from `DATABASE_URL`, `SECRET_KEY`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `TRANSCRIBER`, and email vars, and commit a `.env.example`. Add a `docker-compose.yml` with a Postgres service whose port and credentials match `.env.example`, and document up/down. Confirm `manage.py migrate` and the existing test run against the containerised Postgres under `dev` settings.
 
-## 3. Celery and Redis integration
-Goal: A worker process that can run a task end to end.
-Description: Add a Celery app in `config/`, wire Redis as broker and result backend from `REDIS_URL`, and add a `worker` entry to the process docs. Include one example task and a test that runs it eagerly. No domain tasks yet.
+## 3. Background task queue
+Goal: A database-backed job queue with a worker process and no extra services.
+Description: Add `django-tasks` with its database backend, register the `manage.py db_worker` process in the docs, and configure tasks to run synchronously under tests. Include one example `@task` plus a test that enqueues and runs it. This queue is what every later async job (clustering, transcription, extraction) uses; no domain tasks yet.
 
 ## 4. Base templates and common app helpers
 Goal: A shared layout with HTMX/Alpine loaded and reusable base-model helpers.
@@ -61,7 +61,7 @@ Description: Add `FeedbackCard.objects.visible_to(user, cycle)` returning only t
 
 ## 14. SSE endpoint and event bus
 Goal: A live event stream per retrospective.
-Description: Create `apps/realtime/` with a `GET /events/retro/<id>` view that returns `text/event-stream`, checks membership, emits JSON `{type, ...ids}` events, and sends a heartbeat comment periodically. Back it with a simple in-process publish/subscribe bus and a documented seam for swapping to Redis pub/sub later. Test that a published event reaches a connected consumer.
+Description: Create `apps/realtime/` with a `GET /events/retro/<id>` view that returns `text/event-stream`, checks membership, emits JSON `{type, ...ids}` events, and sends a heartbeat comment periodically. Back it with a simple in-process publish/subscribe bus and a documented seam for swapping to Postgres `LISTEN/NOTIFY` (or Redis) later. Test that a published event reaches a connected consumer.
 
 ## 15. Client-side SSE wiring
 Goal: Browser reacts to server events by refetching the right fragment.
@@ -105,23 +105,23 @@ Description: Add a `Note` model (Retrospective, author, body, `kind` of `note`/`
 
 ## 25. AI app with Claude client and Transcriber interface
 Goal: A single place for model calls and a swappable transcription seam.
-Description: Create `apps/ai/` with a thin Claude client wrapper (reads `ANTHROPIC_API_KEY`, one method that takes a prompt template plus context and returns validated JSON), a `prompts/` directory of versioned prompt files, and a `Transcriber` protocol with a `NullTranscriber` that echoes pasted text and raises for media. No provider SDK beyond Anthropic. Unit-test the wrapper with the network mocked.
+Description: Create `apps/ai/` with a thin Claude client wrapper (reads `ANTHROPIC_API_KEY`, one method that takes a prompt template plus context and returns validated JSON), a `prompts/` directory of versioned prompt files, and a `Transcriber` protocol with a `NullTranscriber` that echoes pasted text and raises for media (the real Whisper implementation lands in task 28). Only the Anthropic SDK is imported here. Unit-test the wrapper with the network mocked.
 
 ## 26. Clustering suggestion task
 Goal: AI proposes an initial set of clusters for revealed feedback.
-Description: Add a Celery task that takes a cycle's revealed cards, calls Claude via the AI app to get `[{title, card_ids}]`, and creates draft `Cluster` and `ClusterCard` rows, leaving unmatched cards ungrouped. Trigger it on the reveal transition and make re-running safe. Assumes the AI app, the retro models, and Celery are set up.
+Description: Add a queued task that takes a cycle's revealed cards, calls Claude via the AI app to get `[{title, card_ids}]`, and creates draft `Cluster` and `ClusterCard` rows, leaving unmatched cards ungrouped. Trigger it on the reveal transition and make re-running safe. Assumes the AI app, the retro models, and the task queue are set up.
 
 ## 27. Meeting record model and upload UI
 Goal: The facilitator submits a meeting recording or transcript.
-Description: Create `apps/meetings/` with `MeetingRecord` (Retrospective, `upload_kind` of audio/video/transcript_file/pasted_text, file, raw_text, transcript_text, `status`) and a page to upload a file or paste text, storing files through the configured storage backend. Show current processing status. No transcription or extraction yet.
+Description: Create `apps/meetings/` with `MeetingRecord` (Retrospective, `upload_kind` of audio/video/transcript_file/pasted_text, raw_text, transcript_text, `status`) and a page to upload a file or paste text. An uploaded file is written to a temporary path for processing only and is never persisted to storage; pasted text goes straight into `raw_text`. Show current processing status. No transcription or extraction yet.
 
-## 28. Transcription chain with NullTranscriber
-Goal: An uploaded record moves through a processing pipeline to a transcript.
-Description: Add a Celery chain that sets `MeetingRecord.status` through `transcribing` and produces `transcript_text` — using the pasted/uploaded text directly, or calling `Transcriber.transcribe` for media — then marks the record ready and broadcasts `meeting.ready`. Wire it to run on upload. Assumes the meetings app, the `Transcriber` interface, and the realtime bus exist.
+## 28. Transcription pipeline with OpenAI Whisper
+Goal: An uploaded recording is transcribed, then the file is discarded.
+Description: Add a queued job that moves `MeetingRecord.status` through `transcribing` and produces `transcript_text` — using pasted/file text directly, or a new `WhisperTranscriber` (OpenAI Whisper API, reads `OPENAI_API_KEY`) for audio/video — then deletes the temp file, marks the record ready, and broadcasts `meeting.ready`. Guard the 25 MB API limit and, on any failure, set status to `failed`. Assumes the meetings app, the `Transcriber` interface, the task queue, and the realtime bus exist.
 
 ## 29. Outcome extraction task
 Goal: AI drafts decisions, action items, and a summary from the transcript.
-Description: Add an `ExtractionDraft` (MeetingRecord 1:1, JSONB payload, confirmed_at) and a Celery task that sends the transcript and the discussion topics to Claude and stores `{decisions[], actions[{description, owner_hint, due_date?}], summary}` in the payload. Nothing is published — the draft is for review only. Assumes the AI app and the meetings pipeline exist.
+Description: Add an `ExtractionDraft` (MeetingRecord 1:1, JSONB payload, confirmed_at) and a queued job that sends the transcript and the discussion topics to Claude and stores `{decisions[], actions[{description, owner_hint, due_date?}], summary}` in the payload. Nothing is published — the draft is for review only. Assumes the AI app and the meetings pipeline exist.
 
 ## 30. Owner matching for extracted action items
 Goal: Map extracted owner hints to real project members.
