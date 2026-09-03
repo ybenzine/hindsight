@@ -1,0 +1,9 @@
+[project]
+name = "hindsight"
+version = "0.1.0"
+description = "Hindsight — team feedback cycles and retrospectives"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]

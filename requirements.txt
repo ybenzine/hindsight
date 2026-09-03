@@ -1,0 +1,5 @@
+Django>=5.1,<5.2
+
+# Test tooling
+pytest>=8.0
+pytest-django>=4.9
