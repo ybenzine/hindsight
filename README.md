@@ -13,19 +13,20 @@ task 2 (settings split + Postgres via docker-compose).
 
 ## Setup
 
-Requires Python 3.14+.
+Requires Python 3.14+. Dependencies are managed with [uv](https://docs.astral.sh/uv/).
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+uv sync
 ```
+
+This creates `.venv/` and installs the runtime and dev dependencies from
+`pyproject.toml` / `uv.lock`.
 
 ## Run the server
 
 ```bash
-python manage.py migrate      # applies Django's built-in migrations
-python manage.py runserver
+uv run python manage.py migrate      # applies Django's built-in migrations
+uv run python manage.py runserver
 ```
 
 The home page is served at http://127.0.0.1:8000/ and currently returns a
@@ -34,7 +35,7 @@ plain-text placeholder.
 ## Run the tests
 
 ```bash
-pytest
+uv run pytest
 ```
 
 Pytest is configured in [`pyproject.toml`](./pyproject.toml)
