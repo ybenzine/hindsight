@@ -1,4 +1,6 @@
-# Weekly Team Feedback Tool — MVP Scope
+# Hindsight — MVP Scope
+
+*Hindsight is a weekly team retrospective tool: it collects honest Start/Stop/Continue feedback, turns it into a focused retrospective, and leaves the meeting with documented decisions and action items.*
 
 ## Product goal
 

@@ -1,4 +1,4 @@
-# Backlog — Weekly Team Feedback Tool
+# Backlog — Hindsight
 
 Tasks are sized for a single session. Each is written to be picked up without
 reading the others; shared context lives in [`plan.md`](./plan.md) and

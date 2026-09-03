@@ -1,4 +1,4 @@
-# Architecture — Weekly Team Feedback Tool (Django)
+# Architecture — Hindsight (Django)
 
 Companion to [`plan.md`](./plan.md). This describes *how* the MVP is built. No code yet.
 
