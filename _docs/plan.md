@@ -1,70 +1,256 @@
-# Weekly Project Retro Tool — Scope
+# Weekly Team Feedback Tool — MVP Scope
 
-_Last updated: 2026-09-03_
+## Product goal
 
-## Summary
+Help project teams collect honest weekly feedback, turn it into a focused retrospective, and leave the meeting with documented decisions and action items.
 
-A shared web app for running a weekly, per-project retrospective in the
-**Start / Stop / Continue** format. There is **one board per project**, accessed
-by a **shareable link** where people just enter a name to join. The board walks a
-team through collecting feedback privately, revealing it all at once, clustering
-and voting on topics, discussing them live, and recording the resulting decisions
-and action items.
+## Core workflow
 
-## Core decisions
+### 1. Create a feedback cycle
 
-- **Feedback flow:** Team → project. Each team member contributes to the project's weekly retro.
-- **Format:** Start / Stop / Continue cards.
-- **Board unit:** One board per project. Cards, votes, and history are scoped to that project.
-- **Access:** Shareable link. People enter a name to join — no signup or login.
-- **Anonymity:** Names appear by default; a contributor can mark any card anonymous.
-- **Discussion:** Live meeting, using the board as the agenda.
-- **Outcome captured:** Decisions and action items from the discussion (recorded only — see out-of-scope).
+A facilitator creates a weekly feedback cycle for a project and invites the team.
 
-## The weekly flow
+The facilitator is usually the project owner, but the role can be assigned to another team member.
 
-1. **Collect** — Each participant adds Start / Stop / Continue cards. Before the
-   reveal, each person sees only their own cards. Name shows by default; any card
-   can be marked anonymous.
-2. **Reveal** — The facilitator triggers a reveal and all cards appear at the same time.
-3. **Cluster** — The team groups related cards into topics.
-4. **Vote** — Each person gets 3 votes to spend across topics, and may stack
-   multiple votes on a single topic.
-5. **Discuss** — Live meeting, working through topics in vote order.
-6. **Record** — The team captures decisions and action items on the board.
-   Recorded only: no owners, due dates, tracking, or carry-over.
-7. **Attach (optional)** — After the meeting, the facilitator can upload audio,
-   video, or a transcript. It is stored on the board as-is, with no processing.
+### 2. Collect feedback
+
+Every team member submits feedback using:
+
+- **Start:** What should the team begin doing?
+- **Stop:** What should the team stop doing?
+- **Continue:** What is working and should continue?
+
+Submissions are attributed by default. Contributors can select **Submit anonymously** for individual entries.
+
+Before the retrospective, contributors can see and edit only their own feedback. They cannot see other team members’ submissions.
+
+### 3. Reveal and cluster feedback
+
+The facilitator starts the retrospective and reveals all submissions at once.
+
+The tool suggests thematic clusters automatically. The team can then:
+
+- Move cards between clusters
+- Merge or split clusters
+- Rename clusters
+- Leave cards ungrouped
+
+### 4. Vote on discussion topics
+
+Each team member receives **3 votes**.
+
+They may place multiple or all votes on the same cluster.
+
+Clusters are ranked by total votes, producing a prioritized discussion agenda.
+
+### 5. Run the discussion
+
+The facilitator works through the prioritized topics and marks each one as:
+
+- Discussed
+- Skipped
+- Deferred
+
+Team members can manually record notes, decisions, and action items during the meeting.
+
+### 6. Process the meeting record
+
+After the meeting, the facilitator can upload:
+
+- Audio
+- Video
+- A transcript file
+- Pasted transcript text
+
+The system generates a transcript when necessary and suggests:
+
+- Decisions made
+- Action items
+- Action owners
+- Due dates, when mentioned
+- A short retrospective summary
+
+The facilitator reviews and confirms these suggestions before they are saved.
+
+## Decisions made for the MVP
+
+### Extracted results require facilitator approval
+
+**Decision:** AI-generated actions and decisions remain drafts until the facilitator confirms them.
+
+**Why:** Transcription and extraction can misunderstand context, ownership, or tentative statements. Automatic publishing would reduce trust and could assign work incorrectly.
+
+**Alternatives considered:**
+
+- Automatic saving: faster, but too risky.
+- Entire-team approval: safer, but creates unnecessary friction.
+- Action-owner approval: useful later, but adds notifications and workflow complexity.
+
+### Feedback is submitted as separate cards
+
+**Decision:** Team members can create multiple short cards under Start, Stop, and Continue.
+
+**Why:** Separate cards are easier to cluster, vote on, move, and discuss than one large response.
+
+**Alternative considered:** One text field per category. Simpler to build, but harder to organize during the retrospective.
+
+### Anonymous feedback stays anonymous
+
+**Decision:** The system does not reveal anonymous authors to the facilitator or team.
+
+**Why:** “Anonymous” should have a clear and trustworthy meaning. Hidden administrator access would discourage honest feedback.
+
+**Alternative considered:** Anonymous to teammates but visible to facilitators. This may be useful in some organizations, but it weakens psychological safety.
+
+### Voting is visible after voting closes
+
+**Decision:** Participants do not see live vote totals while voting. Results appear when everyone has voted or the facilitator closes voting.
+
+**Why:** Hidden totals reduce group influence and popularity bias.
+
+**Alternatives considered:**
+
+- Live totals: more engaging, but encourages people to follow existing votes.
+- Permanently private votes: less transparent and harder to facilitate.
+
+### Automatic clustering is always editable
+
+**Decision:** AI proposes clusters but never finalizes them.
+
+**Why:** Similar wording does not always mean the same underlying problem. The team understands its context better than the model.
+
+**Alternative considered:** Fully automatic clustering. Faster, but likely to create confusing or incorrect groupings.
+
+### Action items have a simple structure
+
+Each action contains:
+
+- Description
+- Owner
+- Optional due date
+- Status: Open or Done
+- Related discussion topic
+
+**Why:** This is enough to make outcomes accountable without turning the MVP into a project-management platform.
+
+**Alternatives considered:** Priorities, subtasks, dependencies, reminders, and recurring tasks. These should be deferred or handled through later integrations.
+
+### One retrospective belongs to one project
+
+**Decision:** Feedback cycles and retrospectives are organized within projects.
+
+**Why:** It provides enough structure for recurring teams while keeping permissions and history understandable.
+
+**Alternative considered:** Organization-wide retrospectives without projects. Simpler initially, but becomes confusing once users participate in multiple teams.
+
+## Main screens
+
+### Project page
+
+Shows:
+
+- Current feedback cycle
+- Submission status
+- Upcoming or active retrospective
+- Previous retrospectives
+- Open action items
+
+### Feedback form
+
+Shows three columns or sections:
+
+- Start
+- Stop
+- Continue
+
+Each entry includes an anonymous checkbox.
+
+### Retrospective board
+
+Supports four modes:
+
+1. Reveal
+2. Cluster
+3. Vote
+4. Discuss
+
+### Meeting upload page
+
+Allows audio, video, transcript-file upload, or pasted text.
+
+Shows processing status and generated results.
+
+### Retrospective summary
+
+Contains:
+
+- Top discussion topics
+- Key notes
+- Confirmed decisions
+- Confirmed action items
+- Attendance and participation
+- Original feedback cards
 
 ## Roles
 
-- **Facilitator** — Creates the board, shares the link, controls the reveal,
-  guides clustering/voting/discussion, records decisions and action items, and
-  can attach post-meeting media.
-- **Participant** — Joins via link, adds cards (optionally anonymous), votes, and
-  takes part in the discussion.
+### Team member
 
-## Explicitly out of scope for v1
+Can:
 
-- Action-item tracking, ownership, due dates, or carry-over of open items to next week.
-- Built-in recording (upload only; no in-app capture).
-- AI summarization or transcription of uploaded media.
-- Integrations (Asana / Jira / Linear / Slack, etc.).
-- Accounts, SSO, or enforced identity.
-- Cross-project dashboards, trends, or reporting.
+- Submit and edit their own feedback
+- Choose attribution or anonymity
+- Participate in clustering
+- Vote
+- View completed retrospective summaries
+- Update actions assigned to them
 
-## Open tensions to resolve before locking
+### Facilitator
 
-- **Anonymity vs. link access.** With "enter a name to join," anonymous cards rely
-  on the honor system — anyone with the link can join under any name. Fine for a
-  trusting team, but anonymity is not enforced.
-- **"Just record" decisions.** Recording action items with no owner or carry-over
-  means nothing pulls last week's open items into this week. It's the lightest
-  build, but action-item follow-through is the feature retros most often grow into.
-  Straightforward to add later since history is stored per project.
+Can also:
 
-## Likely next topics
+- Create and close feedback cycles
+- Start the retrospective
+- Reveal feedback
+- Control the retrospective stages
+- Upload meeting records
+- Review extracted outcomes
+- Edit and publish the final summary
 
-- Data model (boards, cards, clusters, votes, decisions, action items, attachments).
-- The facilitator's screen and the phase controls (collect → reveal → cluster → vote → discuss).
-- How board state stays in sync across participants in real time.
+## Explicitly excluded from the MVP
+
+- Built-in meeting recording
+- Zoom, Google Meet, or Microsoft Teams integrations
+- Slack or email integrations
+- Advanced project-management features
+- Automated reminders and escalation
+- Sentiment or employee-performance scoring
+- Cross-project analytics
+- Custom retrospective frameworks
+- Real-time collaborative transcript editing
+- Multiple approval workflows
+
+## Suggested success metrics
+
+- Percentage of invited members who submit feedback
+- Percentage of retrospectives completed
+- Number of confirmed actions per retrospective
+- Percentage of actions completed before the next retrospective
+- Time from meeting upload to published summary
+- Repeat weekly usage by teams
+
+## MVP definition
+
+The MVP is successful when a team can:
+
+1. Create a project and weekly feedback cycle
+2. Collect private Start, Stop, and Continue cards
+3. Reveal and collaboratively cluster the cards
+4. Vote with three stackable votes per person
+5. Discuss topics in priority order
+6. Upload a meeting recording or transcript
+7. Review extracted actions and decisions
+8. Publish a retrospective summary
+
+## Key scope principle
+
+Keep this a **retrospective workflow**, not a meeting recorder, survey platform, or project-management system.
