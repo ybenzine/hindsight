@@ -13,7 +13,7 @@ task 2 (settings split + Postgres via docker-compose).
 
 ## Setup
 
-Requires Python 3.12+.
+Requires Python 3.14+.
 
 ```bash
 python -m venv .venv
