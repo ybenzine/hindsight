@@ -13,5 +13,6 @@ Definition of done:
 - Every acceptance criterion can be checked by looking at the result
 - Everything moved out of scope links to a follow-up issue
 - An engineer who has never spoken to you could implement it from the issue and the documents it links
+- The groomed issue is labeled `MVP`; any follow-up filed out of it is labeled `fast-follow`, never `MVP`
 
-If something does not belong in this task, do not silently drop it. File a follow-up issue and list it under out of scope with a link to that issue, so it is clear what was moved and where it went.
+If something does not belong in this task, do not silently drop it. File a follow-up issue, label it `fast-follow`, and list it under out of scope with a link to that issue, so it is clear what was moved and where it went.
