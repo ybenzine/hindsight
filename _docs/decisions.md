@@ -56,12 +56,16 @@ for a single web process, which is what the MVP deploys (#38). Swapping to
 Postgres `LISTEN/NOTIFY` or Redis for multi-process scaling is deliberately
 deferred: #40.
 
-## Whisper's 25 MB limit (#28)
+## Whisper's 25 MB limit (#28, #41)
 
-The MVP **rejects** an upload over the API's 25 MB limit with a clear
-`failed` status and a user-facing message — it does not transcode or segment.
-Automatic `ffmpeg` segmentation so oversized recordings still transcribe is
-deferred: #41.
+#28 rejects an upload over the API's 25 MB limit with a clear `failed` status
+and a user-facing message as its own first pass. #41 (automatic `ffmpeg`
+segmentation so an oversized recording still transcribes) is **MVP scope**,
+not deferred: `_docs/outdated/plan.md`'s core workflow explicitly includes
+uploading *video*, and a realistic 20–30+ minute recording routinely exceeds
+25 MB — without segmentation, "upload a meeting recording" fails outright for
+a typical video export, not just an edge case. #41 was originally filed as a
+fast-follow while grooming #28 and was promoted after a scope review.
 
 ## Accessibility
 
@@ -77,3 +81,12 @@ deferred to one cross-cutting issue: #39.
 - `fast-follow` — real work, deliberately not part of the MVP. Never both.
 - `groomed` — the PM role has rewritten the issue onto `_docs/task-template.md`
   and it is ready for an engineer to pick up.
+
+## Fast-follow scope review
+
+After grooming #3-#36, every fast-follow (#37-#42) was checked against
+`_docs/outdated/plan.md`'s MVP definition and exclusions list. Five held up as
+correctly deferred (#37 CI, #38 deployment, #39 accessibility audit, #40
+realtime multi-process scaling, #42 invite-by-email for new users — none are
+part of the "a team can..." MVP list or are explicitly deferred by the
+architecture doc). #41 was promoted to MVP; see above.
